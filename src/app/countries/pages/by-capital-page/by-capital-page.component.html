@@ -1,0 +1,22 @@
+<h2>By Capital</h2>
+<hr>
+
+<div class="row">
+    <div class="col">
+        <!-- Search box -->
+        <shared-search-box [placeholder]="'Search by capital'" (onSearchValue)="onSearchByCapital($event)"></shared-search-box>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <!-- Tabla resultados -->
+        <!-- <ul>
+            <li *ngFor="let country of countries">
+                <p class="mb-0"><strong>{{ country.capital[0] }}</strong></p>
+                <small>{{ country.name.common }}</small>
+            </li>
+        </ul> -->
+        <countries-table [countries]="countries"></countries-table>
+    </div>
+</div>
