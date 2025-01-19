@@ -16,6 +16,20 @@ export class CountriesService {
         private toastr: ToastrService
     ) {}
 
+    private getCountriesRequest(url: string, successMsg?: string, errorMsg?: string): Observable<Country[]> {
+        return this.http.get<Country[]>(url).pipe(
+            filter(data => !!data),
+            tap(data => {
+                this.toastr.success(`${successMsg}`);
+                return data;
+            }),
+            catchError( () => {
+                this.toastr.error(`Error en la búsqueda, ${errorMsg}`);
+                return of([])
+            })
+        );
+    }
+
     searchCountryById( id: string ): Observable<Country | null> {
         return this.http.get<Country[] | null>(`${this.apiUrl}/alpha/${id}`).pipe(
             filter(countries => !!countries),
@@ -32,43 +46,18 @@ export class CountriesService {
     }
 
     searchCapital( term: string ): Observable<Country[]> {
-        return this.http.get<Country[]>(`${this.apiUrl}/capital/${term}`).pipe(
-            filter(data => !!data),
-            tap(data => {
-                this.toastr.success('Búsqueda correcta');
-                return data;
-            }),
-            catchError( error => {
-                this.toastr.error('Error en la búsqueda, capital incorrecta');
-                return of([])
-            })
-        );
+        const url = `${this.apiUrl}/capital/${term}`;
+        return this.getCountriesRequest(url, 'Búsqueda correcta', 'capital incorrecta');
     }
 
     searchCountry( term: string ): Observable<Country[]>  {
-        return this.http.get<Country[]>(`${this.apiUrl}/name/${term}`).pipe(
-            filter(data => !!data),
-            tap(data => {
-                if(data) this.toastr.success('Búsqueda correcta')
-            }),
-            catchError( () => {
-                this.toastr.error('Error en la búsqueda, país incorrecto');
-                return of([]);
-            })
-        );
+        const url = `${this.apiUrl}/name/${term}`;
+        return this.getCountriesRequest(url, 'Búsqueda correcta', 'país incorrecto');
     }
 
     searchRegion( region: string ): Observable<Country[]> {
-        return this.http.get<Country[]>(`${this.apiUrl}/region/${region}`).pipe(
-            filter(data => !!data),
-            tap(data => {
-                if(data) this.toastr.success('Búsqueda correcta');
-            }),
-            catchError( () => {
-                this.toastr.error('Error en la búsqueda, región incorrecto');
-                return of([])
-            })
-        );
+        const url = `${this.apiUrl}/region/${region}`;
+        return this.getCountriesRequest(url, 'Búsqueda correcta', 'región incorrecto');
     }
 
 }
