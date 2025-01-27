@@ -1,6 +1,8 @@
+<!-- (keyup.enter)="onSearchCriteria()" -->
 <input 
     #txtSearchInput
     type="text"
     [placeholder]="placeholder"
     class="form-control"
-    (keyup.enter)="onSearchCriteria()">
+    (keyup)="onKeyPress(txtSearchInput.value)"
+    [value]="initialSearchValue">

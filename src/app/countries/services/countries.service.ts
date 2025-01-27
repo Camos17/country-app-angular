@@ -3,6 +3,8 @@ import { Injectable } from "@angular/core";
 import { Country } from "../interfaces/country.interface";
 import { catchError, filter, map, Observable, of, tap } from "rxjs";
 import { ToastrService } from "ngx-toastr";
+import { CacheStore } from "../interfaces/cache-store.interface";
+import { Region } from "../interfaces/region.type";
 
 @Injectable({
     providedIn: 'root'
@@ -11,10 +13,16 @@ export class CountriesService {
 
     private apiUrl: string = 'https://restcountries.com/v3.1';
 
+    public cacheStore: CacheStore = {
+        byCapital: { term: '', countries: [] },
+        byCountries: { term: '', countries: [] },
+        byRegion: { region: '', countries: [] }
+    };
+
     constructor(
         private http: HttpClient,
         private toastr: ToastrService
-    ) {}
+    ) { }
 
     private getCountriesRequest(url: string, successMsg?: string, errorMsg?: string): Observable<Country[]> {
         return this.http.get<Country[]>(url).pipe(
@@ -47,17 +55,23 @@ export class CountriesService {
 
     searchCapital( term: string ): Observable<Country[]> {
         const url = `${this.apiUrl}/capital/${term}`;
-        return this.getCountriesRequest(url, 'Búsqueda correcta', 'capital incorrecta');
+        return this.getCountriesRequest(url, 'Búsqueda correcta', 'capital incorrecta').pipe(
+            tap(countries => this.cacheStore.byCapital = { term, countries })
+        );
     }
 
     searchCountry( term: string ): Observable<Country[]>  {
         const url = `${this.apiUrl}/name/${term}`;
-        return this.getCountriesRequest(url, 'Búsqueda correcta', 'país incorrecto');
+        return this.getCountriesRequest(url, 'Búsqueda correcta', 'país incorrecto').pipe(
+            tap(countries => this.cacheStore.byCountries = { term, countries })
+        );
     }
 
-    searchRegion( region: string ): Observable<Country[]> {
+    searchRegion( region: Region ): Observable<Country[]> {
         const url = `${this.apiUrl}/region/${region}`;
-        return this.getCountriesRequest(url, 'Búsqueda correcta', 'región incorrecto');
+        return this.getCountriesRequest(url, 'Búsqueda correcta', 'región incorrecta').pipe(
+            tap(countries => this.cacheStore.byRegion = { region, countries })
+        );
     }
 
 }
