@@ -22,7 +22,19 @@ export class CountriesService {
     constructor(
         private http: HttpClient,
         private toastr: ToastrService
-    ) { }
+    ) {
+        this.getDataFromLocalStorage();
+     }
+
+
+    private saveDataToLocalStorage(): void {
+        localStorage.setItem('cacheStore', JSON.stringify(this.cacheStore));
+    }
+
+    private getDataFromLocalStorage() {
+        if(!localStorage.getItem('cacheStore')) return;
+        this.cacheStore = JSON.parse( localStorage.getItem('cacheStore')! );
+    }
 
     private getCountriesRequest(url: string, successMsg?: string, errorMsg?: string): Observable<Country[]> {
         return this.http.get<Country[]>(url).pipe(
@@ -56,21 +68,26 @@ export class CountriesService {
     searchCapital( term: string ): Observable<Country[]> {
         const url = `${this.apiUrl}/capital/${term}`;
         return this.getCountriesRequest(url, 'Búsqueda correcta', 'capital incorrecta').pipe(
-            tap(countries => this.cacheStore.byCapital = { term, countries })
+            tap(countries => {
+                this.cacheStore.byCapital = { term, countries }
+                this.saveDataToLocalStorage();
+            })
         );
     }
 
     searchCountry( term: string ): Observable<Country[]>  {
         const url = `${this.apiUrl}/name/${term}`;
         return this.getCountriesRequest(url, 'Búsqueda correcta', 'país incorrecto').pipe(
-            tap(countries => this.cacheStore.byCountries = { term, countries })
+            tap(countries => this.cacheStore.byCountries = { term, countries }),
+            tap(() => this.saveDataToLocalStorage())
         );
     }
 
     searchRegion( region: Region ): Observable<Country[]> {
         const url = `${this.apiUrl}/region/${region}`;
         return this.getCountriesRequest(url, 'Búsqueda correcta', 'región incorrecta').pipe(
-            tap(countries => this.cacheStore.byRegion = { region, countries })
+            tap(countries => this.cacheStore.byRegion = { region, countries }),
+            tap(() => this.saveDataToLocalStorage())
         );
     }
 
