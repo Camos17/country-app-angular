@@ -4,7 +4,7 @@ import { debounceTime, Subject, Subscription } from 'rxjs';
 @Component({
   selector: 'shared-search-box',
   templateUrl: './search-box.component.html',
-  styleUrl: './search-box.component.sass'
+  styleUrls: ['./search-box.component.sass']
 })
 export class SearchBoxComponent implements OnInit, OnDestroy {
   
